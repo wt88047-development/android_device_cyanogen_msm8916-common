@@ -117,6 +117,9 @@ DEVICE_MATRIX_FILE := $(PLATFORM_PATH)/compatibility_matrix.xml
 # Media
 TARGET_USES_MEDIA_EXTENSIONS := true
 
+# Peripheral manager
+TARGET_PER_MGR_ENABLED := true
+
 # Power
 ifeq ($(TARGET_BOARD_PLATFORM_VARIANT),msm8939)
 TARGET_POWERHAL_SET_INTERACTIVE_EXT := $(PLATFORM_PATH)/power/power_ext.c
