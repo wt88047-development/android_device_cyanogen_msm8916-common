@@ -151,6 +151,9 @@ BOARD_SEPOLICY_DIRS += \
 # Telephony
 TARGET_PROVIDES_QTI_TELEPHONY_JAR := true
 
+TARGET_FS_CONFIG_GEN += \
+    $(PLATFORM_PATH)/fs_config/file_caps.fs
+
 # Shims
 TARGET_LD_SHIM_LIBS := \
     /system/vendor/lib64/libflp.so|libshims_flp.so \
