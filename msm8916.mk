@@ -15,6 +15,8 @@
 # limitations under the License.
 #
 
+include device/cyanogen/msm8916-common/device_props.mk
+
 # Overlay
 DEVICE_PACKAGE_OVERLAYS += $(LOCAL_PATH)/overlay
 PRODUCT_ENFORCE_RRO_TARGETS := framework-res
