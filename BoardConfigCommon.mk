@@ -60,8 +60,10 @@ USE_CUSTOM_AUDIO_POLICY := 1
 BOARD_HAVE_BLUETOOTH_QCOM := true
 
 # Camera
+TARGET_NEEDS_PLATFORM_TEXT_RELOCATIONS := true
 TARGET_PROCESS_SDK_VERSION_OVERRIDE := \
-    /system/vendor/bin/mm-qcamera-daemon=23
+	/system/bin/mediaserver=22 \
+	/system/vendor/bin/mm-qcamera-daemon=22
 
 # Display
 MAX_EGL_CACHE_KEY_SIZE := 12*1024
