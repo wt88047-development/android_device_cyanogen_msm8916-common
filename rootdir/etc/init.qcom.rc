@@ -83,7 +83,7 @@ on post-fs-data
     mkdir /data/vendor/wifi/wpa/sockets 0770 wifi wifi
 
     # Create /data/time folder for time-services
-    mkdir /data/time 0700 system system
+    mkdir /data/time/ 0700 system system
 
     # Tombstones
     mkdir /data/tombstones/modem 0771 system system
@@ -114,14 +114,19 @@ on boot
     chown bluetooth bluetooth /dev/ttyHS0
     chmod 0660 /dev/ttyHS0
 
-    # Create QMUX deamon socket area
-    mkdir /dev/socket/qmux_radio 2770 radio radio
-    mkdir /dev/socket/qmux_audio 2770 media audio
-    mkdir /dev/socket/qmux_bluetooth 2770 bluetooth bluetooth
-    mkdir /dev/socket/qmux_gps 2770 gps gps
+    #Create QMUX deamon socket area
+    mkdir /dev/socket/qmux_radio 0770 radio radio
+    chmod 2770 /dev/socket/qmux_radio
+    mkdir /dev/socket/qmux_audio 0770 media audio
+    chmod 2770 /dev/socket/qmux_audio
+    mkdir /dev/socket/qmux_bluetooth 0770 bluetooth bluetooth
+    chmod 2770 /dev/socket/qmux_bluetooth
+    mkdir /dev/socket/qmux_gps 0770 gps gps
+    chmod 2770 /dev/socket/qmux_gps
 
     # Create persist folders
     mkdir /persist/alarm 0770 system system
+	mkdir /persist/time 0770 system system
     mkdir /persist/display 0770 system graphics
 
     # Create NETMGR daemon socket area
@@ -221,7 +226,7 @@ on property:vendor.hw.fm.init=1
 service qmuxd /system/vendor/bin/qmuxd
     class main
     user root
-    group radio audio bluetooth gps oem_2950 wakelock
+    group radio audio bluetooth gps nfc diag
     writepid /dev/cpuset/system-background/tasks
 
 service msm_irqbalance /system/vendor/bin/msm_irqbalance -f /system/vendor/etc/msm_irqbalance.conf
@@ -235,6 +240,12 @@ service netmgrd /system/vendor/bin/netmgrd
     user root
     group root wifi wakelock radio inet
     writepid /dev/cpuset/system-background/tasks
+	
+service qti /system/vendor/bin/qti
+    class main
+    user radio
+    group radio oem_2901 diag usb net_admin
+    disabled
 
 # Adjust socket buffer to enlarge TCP receive window for high bandwidth
 # but only if ro.data.large_tcp_window_size property is set.
@@ -300,7 +311,7 @@ service thermal-engine /system/vendor/bin/thermal-engine
     writepid /dev/cpuset/system-background/tasks
 
 service time_daemon /system/vendor/bin/time_daemon
-    class late_start
+    class main
     user root
     group root
     writepid /dev/cpuset/system-background/tasks
@@ -311,24 +322,74 @@ service ppd /system/vendor/bin/mm-pp-daemon
     user system
     socket pps stream 0660 system system
     group system graphics
+	
+service per_mgr /system/vendor/bin/pm-service
+    class core
+    user system
+    group system
+	
+service per_proxy /system/vendor/bin/pm-proxy
+    class core
+    user system
+    group system
+    disabled
 
-service vendor.imsqmidaemon /system/vendor/bin/imsqmidaemon
+on property:init.svc.per_mgr=running
+    start per_proxy
+
+on property:sys.powerctl=*
+    stop per_proxy
+
+on property:sys.shutdown.requested=*
+    stop per_proxy
+
+service qcom-sh /vendor/bin/init.qcom.sh
+    class late_start
+    user root
+    oneshot
+
+service imsstarter /vendor/bin/init.qti.ims.sh
+    class main
+    oneshot
+
+on property:vold.decrypt=trigger_restart_framework
+    start imsstarter
+
+service imsqmidaemon /system/vendor/bin/imsqmidaemon
     class main
     user system
     socket ims_qmid stream 0660 system radio
     group radio log diag
-    writepid /dev/cpuset/system-background/tasks
+    disabled
 
-service vendor.imsdatadaemon /system/vendor/bin/imsdatadaemon
+on property:service.qti.ims.enabled=1
+    start imsqmidaemon
+
+service imsdatadaemon /system/vendor/bin/imsdatadaemon
     class main
     user system
     socket ims_datad stream 0660 system radio
     group system wifi radio inet log diag
-    writepid /dev/cpuset/system-background/tasks
     disabled
 
 on property:vendor.ims.QMI_DAEMON_STATUS=1
-    start vendor.imsdatadaemon
+    start imsdatadaemon
+
+service ims_rtp_daemon /system/vendor/bin/ims_rtp_daemon
+   class main
+   user system
+   group radio diag log inet
+   disabled
+
+service vendor.imsrcsservice /system/vendor/bin/imsrcsd
+   class main
+   user system
+   group radio diag inet log
+   disabled
+
+on property:vendor.ims.DATA_DAEMON_STATUS=1
+    start ims_rtp_daemon
+    start vendor.imsrcsservice
 
 on property:init.svc.surfaceflinger=stopped
     stop ppd
