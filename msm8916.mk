@@ -188,6 +188,14 @@ PRODUCT_PACKAGES += \
     librmnetctl \
     libxml2
 
+# RCS
+PRODUCT_PACKAGES += \
+    com.android.ims.rcsmanager \
+    rcs_service_aidl \
+    rcs_service_aidl.xml \
+    rcs_service_api \
+    rcs_service_api.xml
+
 # Recovery
 PRODUCT_PACKAGES += \
     librecovery_updater_cm
@@ -232,9 +240,7 @@ PRODUCT_PACKAGES += \
     ims-ext-common \
     telephony-ext
 
-# QCOM qti whitelist
-PRODUCT_COPY_FILES += \
-    $(LOCAL_PATH)/configs/qti_whitelist.xml:system/etc/sysconfig/qti_whitelist.xml
+PRODUCT_BOOT_JARS += telephony-ext
 
 # Voice mail
 PRODUCT_COPY_FILES += \
@@ -244,8 +250,3 @@ PRODUCT_COPY_FILES += \
     $(LOCAL_PATH)/configs/p2p_supplicant_overlay.conf:$(TARGET_COPY_OUT_VENDOR)/etc/wifi/p2p_supplicant_overlay.conf \
     $(LOCAL_PATH)/configs/wpa_supplicant_overlay.conf:$(TARGET_COPY_OUT_VENDOR)/etc/wifi/wpa_supplicant_overlay.conf \
     $(LOCAL_PATH)/configs/WCNSS_qcom_cfg.ini:$(TARGET_COPY_OUT_VENDOR)/firmware/wlan/prima/WCNSS_qcom_cfg.ini
-
-PRODUCT_PACKAGES += \
-    android.hidl.base@1.0 \
-    android.hidl.manager@1.0 \
-    android.hidl.manager@1.0-java
