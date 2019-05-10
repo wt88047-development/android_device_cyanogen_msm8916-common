@@ -375,11 +375,11 @@ service imsdatadaemon /system/vendor/bin/imsdatadaemon
 on property:vendor.ims.QMI_DAEMON_STATUS=1
     start imsdatadaemon
 
-service ims_rtp_daemon /system/vendor/bin/ims_rtp_daemon
-   class main
-   user system
-   group radio diag log inet
-   disabled
+#service ims_rtp_daemon /system/vendor/bin/ims_rtp_daemon
+#   class main
+#   user system
+#   group radio diag log inet
+#   disabled
 
 service vendor.imsrcsservice /system/vendor/bin/imsrcsd
    class main
@@ -388,7 +388,7 @@ service vendor.imsrcsservice /system/vendor/bin/imsrcsd
    disabled
 
 on property:vendor.ims.DATA_DAEMON_STATUS=1
-    start ims_rtp_daemon
+#    start ims_rtp_daemon
     start vendor.imsrcsservice
 
 on property:init.svc.surfaceflinger=stopped
